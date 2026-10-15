@@ -50,15 +50,40 @@ viewer.entities.add(aircraftEntity);
 viewer.flyTo(aircraftEntity, {duration: 0.1}).catch(()=>{});
 $("model-state").textContent = "Loading A320 model…";
 
-aircraftEntity.model.readyEvent.addEventListener(() => {
-  state.modelLoaded = true;
-  $("model-state").textContent = "A320 loaded";
-});
-aircraftEntity.model.errorEvent.addEventListener((err) => {
-  console.warn("Aircraft model failed to load", err);
-  $("model-state").textContent = "Model unavailable — check URL";
-  makeSimplePlaneMarker();
-});
+const aircraftModelGraphics = aircraftEntity.model;
+
+if (aircraftModelGraphics) {
+  const modelUrl = AIRCRAFT_MODEL_URL;
+
+  Cesium.Model.fromGltfAsync({
+    url: modelUrl,
+    modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
+      Cesium.Cartesian3.fromDegrees(
+        state.lon,
+        state.lat,
+        Math.max(20, state.altitude * 0.3048)
+      ),
+      new Cesium.HeadingPitchRoll(
+        Cesium.Math.toRadians(state.heading),
+        Cesium.Math.toRadians(state.pitch),
+        Cesium.Math.toRadians(state.bank)
+      )
+    ),
+    scale: 1,
+    minimumPixelSize: 72,
+    maximumScale: 9000
+  }).then((model) => {
+    viewer.scene.primitives.add(model);
+    state.modelLoaded = true;
+    $("model-state").textContent = "A320 loaded";
+    window.aircraftModel = model;
+  }).catch((err) => {
+    console.error("Aircraft model failed to load:", err);
+    $("model-state").textContent = "Model unavailable — check URL";
+    makeSimplePlaneMarker();
+  });
+}
+
 function makeSimplePlaneMarker() {
   // A visible marker is used if the external GLB cannot be loaded.
   if (viewer.entities.getById("fallback-plane")) return;
