@@ -10,19 +10,32 @@ const state = {
 };
 
 const viewer = new Cesium.Viewer("globe", {
-  animation: false, timeline: false, baseLayerPicker: false, geocoder: false,
-  homeButton: false, sceneModePicker: false, navigationHelpButton: false,
-  infoBox: false, selectionIndicator: false, fullscreenButton: false,
-  shouldAnimate: true, terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+  animation: false,
+  timeline: false,
+  baseLayerPicker: false,
+  geocoder: false,
+  homeButton: false,
+  sceneModePicker: false,
+  navigationHelpButton: false,
+  infoBox: false,
+  selectionIndicator: false,
+  fullscreenButton: false,
+  shouldAnimate: true,
+
+  terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+
   imageryProvider: new Cesium.UrlTemplateImageryProvider({
     url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     credit: "© OpenStreetMap contributors",
+    minimumLevel: 0,
     maximumLevel: 19
   })
 });
-viewer.scene.globe.enableLighting = true;
-viewer.scene.globe.depthTestAgainstTerrain = false;
-viewer.scene.backgroundColor = Cesium.Color.fromCssColorString("#07111e");
+
+viewer.scene.globe.show = true;
+viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString("#162536");
+viewer.scene.globe.enableLighting = false;
+viewer.scene.requestRender();
 viewer.scene.screenSpaceCameraController.minimumZoomDistance = 20;
 viewer.scene.screenSpaceCameraController.maximumZoomDistance = 40000000;
 
